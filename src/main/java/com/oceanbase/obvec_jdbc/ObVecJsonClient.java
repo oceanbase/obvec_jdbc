@@ -31,9 +31,9 @@ public class ObVecJsonClient extends ObVecClient {
     public static String META_JSON_TABLE_NAME = "_meta_json_t";
     private final Logger logger = Logger.getLogger(ObVecJsonClient.class.getName());
     private JsonTableMetadata metadata;
-    private int user_id;
+    private String user_id;
 
-    public ObVecJsonClient(String uri, String user, String password, int user_id, Level log_level)
+    public ObVecJsonClient(String uri, String user, String password, String user_id, Level log_level)
     {
         super(uri, user, password);
         this.logger.setLevel(log_level);
@@ -41,14 +41,14 @@ public class ObVecJsonClient extends ObVecClient {
         this.user_id = user_id;
         
         String createDataJsonTableSQL = "CREATE TABLE IF NOT EXISTS `" + DATA_JSON_TABLE_NAME + "` (\n" + //
-                "  `user_id` int(11) NOT NULL,\n" + //
+                "  `user_id` varchar(128) NOT NULL,\n" + //
                 "  `jtable_name` varchar(512) NOT NULL,\n" + //
                 "  `jdata_id` int(11) NOT NULL AUTO_INCREMENT,\n" + //
                 "  `jdata` json DEFAULT NULL,\n" + //
                 "  PRIMARY KEY (`jdata_id`, `user_id`, `jtable_name`)\n" + //
                 ")";
         String createMetaJsonTableSQL = "CREATE TABLE IF NOT EXISTS `" + META_JSON_TABLE_NAME + "` (\n" + //
-                "  `user_id` int(11) NOT NULL,\n" + //
+                "  `user_id` varchar(128) NOT NULL,\n" + //
                 "  `jtable_name` varchar(512) NOT NULL,\n" + //
                 "  `jcol_id` int(11) NOT NULL,\n" + //
                 "  `jcol_name` varchar(512) NOT NULL,\n" + //
@@ -220,7 +220,7 @@ public class ObVecJsonClient extends ObVecClient {
                 
                 JSONObject json_default = new JSONObject();
                 json_default.put("default", col_default_val);
-                insert_schema_stmt.setInt(1, this.user_id);
+                insert_schema_stmt.setString(1, this.user_id);
                 insert_schema_stmt.setString(2, table_name);
                 insert_schema_stmt.setInt(3, col_id);
                 insert_schema_stmt.setString(4, col_name);
@@ -340,16 +340,16 @@ public class ObVecJsonClient extends ObVecClient {
             JSONObject json_default = new JSONObject();
             json_default.put("default", null);
             update_meta_sql.setString(5, json_default.toJSONString());
-            update_meta_sql.setInt(6, this.user_id);
+            update_meta_sql.setString(6, this.user_id);
             update_meta_sql.setString(7, table_name);
             update_meta_sql.setString(8, old_col_name);
             update_meta_sql.executeUpdate();
 
-            rename_col_sql.setInt(1, this.user_id);
+            rename_col_sql.setString(1, this.user_id);
             rename_col_sql.setString(2, table_name);
             rename_col_sql.executeUpdate();
 
-            cast_col_sql.setInt(1, this.user_id);
+            cast_col_sql.setString(1, this.user_id);
             cast_col_sql.setString(2, table_name);
             cast_col_sql.executeUpdate();
             this.conn.commit();
@@ -388,12 +388,12 @@ public class ObVecJsonClient extends ObVecClient {
         try (PreparedStatement update_meta_sql = this.conn.prepareStatement(update_meta_sql_str);
              PreparedStatement delete_col_sql = this.conn.prepareStatement(delete_col_sql_str)) {
             this.conn.setAutoCommit(false);
-            update_meta_sql.setInt(1, this.user_id);
+            update_meta_sql.setString(1, this.user_id);
             update_meta_sql.setString(2, table_name);
             update_meta_sql.setString(3, col_name);
             update_meta_sql.executeUpdate();
 
-            delete_col_sql.setInt(1, this.user_id);
+            delete_col_sql.setString(1, this.user_id);
             delete_col_sql.setString(2, table_name);
             delete_col_sql.executeUpdate();
             this.conn.commit();
@@ -531,17 +531,17 @@ public class ObVecJsonClient extends ObVecClient {
             JSONObject json_default = new JSONObject();
             json_default.put("default", col_constraints.jcol_default);
             update_meta_sql.setString(5, json_default.toJSONString());
-            update_meta_sql.setInt(6, this.user_id);
+            update_meta_sql.setString(6, this.user_id);
             update_meta_sql.setString(7, table_name);
             update_meta_sql.setString(8, col_name);
             update_meta_sql.executeUpdate();
             
             if (col_constraints.jcol_default == null) {
-                cast_col_sql_without_default.setInt(1, this.user_id);
+                cast_col_sql_without_default.setString(1, this.user_id);
                 cast_col_sql_without_default.setString(2, table_name);
                 cast_col_sql_without_default.executeUpdate();
             } else {
-                cast_col_sql.setInt(1, this.user_id);
+                cast_col_sql.setString(1, this.user_id);
                 cast_col_sql.setString(2, table_name);
                 cast_col_sql.executeUpdate();
             }
@@ -613,7 +613,7 @@ public class ObVecJsonClient extends ObVecClient {
              PreparedStatement insert_col_sql_without_default = this.conn.prepareStatement(insert_col_sql_str_without_default);
              PreparedStatement insert_col_sql = this.conn.prepareStatement(insert_col_sql_str)) {
             this.conn.setAutoCommit(false);
-            insert_sql.setInt(1, this.user_id);
+            insert_sql.setString(1, this.user_id);
             insert_sql.setString(2, table_name);
             insert_sql.setInt(3, cur_col_id);
             insert_sql.setString(4, col_name);
@@ -626,11 +626,11 @@ public class ObVecJsonClient extends ObVecClient {
             insert_sql.executeUpdate();
             
             if (col_constraints.jcol_default == null) {
-                insert_col_sql_without_default.setInt(1, this.user_id);
+                insert_col_sql_without_default.setString(1, this.user_id);
                 insert_col_sql_without_default.setString(2, table_name);
                 insert_col_sql_without_default.executeUpdate();
             } else {
-                insert_col_sql.setInt(1, this.user_id);
+                insert_col_sql.setString(1, this.user_id);
                 insert_col_sql.setString(2, table_name);
                 insert_col_sql.executeUpdate();
             }
@@ -667,7 +667,7 @@ public class ObVecJsonClient extends ObVecClient {
         try (PreparedStatement update_name_sql = this.conn.prepareStatement(update_name_sql_str)) {
             this.conn.setAutoCommit(false);
             update_name_sql.setString(1, new_table_name);
-            update_name_sql.setInt(2, this.user_id);
+            update_name_sql.setString(2, this.user_id);
             update_name_sql.setString(3, table_name);
             update_name_sql.executeUpdate();
             this.conn.commit();

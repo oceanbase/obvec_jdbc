@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 public class JsonTableMetadata {
-    private int user_id;
+    private String user_id;
     private HashMap<String, ArrayList<JsonTableColumn>> meta_cache;
     // private static String meta_col_name[] = new String[] {
     //     "user_id",
@@ -24,7 +24,7 @@ public class JsonTableMetadata {
     //     "jcol_default",
     // };
 
-    public JsonTableMetadata(int user_id) {
+    public JsonTableMetadata(String user_id) {
         this.user_id = user_id;
         meta_cache = new HashMap<>();
     }
@@ -41,7 +41,7 @@ public class JsonTableMetadata {
                 "jcol_name, jcol_type, jcol_nullable, " + //
                 "jcol_has_default, jcol_default " + //
                 "FROM _meta_json_t " + //
-                "WHERE user_id = %d",
+                "WHERE user_id = '%s'",
                 user_id
             );
 
