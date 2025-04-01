@@ -76,7 +76,7 @@ public class App
                         DataType.INT32,
                         DataType.JSON,
                         DataType.FLOAT_VECTOR
-                     });
+                     }, null);
             if (res != null) {
                 for (int i = 0; i < res.size(); i++) {
                     // System.err.printf("%s");

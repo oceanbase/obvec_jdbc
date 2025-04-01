@@ -179,13 +179,13 @@ public class ObVecClient {
     }
 
     public ArrayList<HashMap<String, Sqlizable>> query(String table_name, 
-                    //   String where_expr,
                       String vec_col_name,
                       String metric_type,
                       float[] qv,
                       int topk,
                       String[] output_fields,
-                      DataType[] output_datatypes)
+                      DataType[] output_datatypes,
+                      String where_expr)
     {
         if (output_datatypes.length != output_fields.length) {
             return null;
@@ -198,12 +198,15 @@ public class ObVecClient {
 
         String metric_type_lower = metric_type.toLowerCase();
         if (!metric_type_lower.equals("l2") &&
-            !metric_type_lower.equals("ip")) {
+            !metric_type_lower.equals("ip") &&
+            !metric_type_lower.equals("cosine")) {
             throw new UnsupportedOperationException("Metric Type is not supported.");
         }
         String dist_func = "l2_distance";
         if (metric_type_lower.equals("ip")) {
-            dist_func = "inner_product";
+            dist_func = "negative_inner_product";
+        } else if (metric_type_lower.equals("cosine")) {
+            dist_func = "cosine_distance";
         }
         
         String[] vec_str = new String[qv.length];
@@ -213,10 +216,11 @@ public class ObVecClient {
 
         try {
             statement = conn.createStatement();            
-
-            String sql = String.format("SELECT %s FROM %s ORDER BY %s(%s, '[%s]') APPROXIMATE LIMIT %d",
+            
+            String sql = String.format("SELECT %s FROM %s WHERE %s ORDER BY %s(%s, '[%s]') APPROXIMATE LIMIT %d",
                             String.join(", ", output_fields),
                             table_name,
+                            (where_expr == null) ? "" : where_expr,
                             dist_func,
                             vec_col_name,
                             String.join(", ", vec_str),
