@@ -45,7 +45,7 @@ public class AppTest
         String uri = "jdbc:oceanbase://127.0.0.1:2881/test";
         String user = "root@test";
         String password = "";
-        ObVecJsonClient client = new ObVecJsonClient(uri, user, password, "e5a69db04c5ea54adf324907d4b8f364", Level.INFO);
+        ObVecJsonClient client = new ObVecJsonClient(uri, user, password, "e5a69db04c5ea54adf324907d4b8f364", Level.INFO, false);
         client.reset();
         String sql = "create table `t2` (c1 int NOT NULL DEFAULT 10, c2 varchar(30) DEFAULT 'ca', c3 varchar not null, c4 decimal(10, 2), c5 timestamp default current_timestamp);";
         client.parseJsonTableSQL2NormalSQL(sql);
