@@ -33,7 +33,7 @@ public class ObVecJsonClient extends ObVecClient {
     private JsonTableMetadata metadata;
     private String user_id;
 
-    public ObVecJsonClient(String uri, String user, String password, String user_id, Level log_level)
+    public ObVecJsonClient(String uri, String user, String password, String user_id, Level log_level, boolean skip_create)
     {
         super(uri, user, password);
         this.logger.setLevel(log_level);
@@ -59,18 +59,20 @@ public class ObVecJsonClient extends ObVecClient {
                 "  PRIMARY KEY (`user_id`, `jtable_name`, `jcol_id`, `jcol_name`)\n" + //
                 ")";
         
-        try (Statement stmt = this.conn.createStatement()) {
-            this.conn.setAutoCommit(false);
-            stmt.execute(createDataJsonTableSQL);
-            stmt.execute(createMetaJsonTableSQL);
-            this.conn.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            if (this.conn != null) {
-                try {
-                    this.conn.rollback();
-                } catch (SQLException se) {
-                    se.printStackTrace();
+        if (!skip_create) {
+            try (Statement stmt = this.conn.createStatement()) {
+                this.conn.setAutoCommit(false);
+                stmt.execute(createDataJsonTableSQL);
+                stmt.execute(createMetaJsonTableSQL);
+                this.conn.commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                if (this.conn != null) {
+                    try {
+                        this.conn.rollback();
+                    } catch (SQLException se) {
+                        se.printStackTrace();
+                    }
                 }
             }
         }
