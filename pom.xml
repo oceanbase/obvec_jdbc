@@ -1,33 +1,109 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.oceanbase</groupId>
   <artifactId>obvec_jdbc</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <name>obvec_jdbc</name>
+  <description>JAVA SDK for OceanBase Vector Store and JSON virtual table.</description>
   <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>  <!-- 指定源码兼容 Java 8 -->
+    <maven.compiler.target>1.8</maven.compiler.target>  <!-- 指定编译目标 Java 8 -->
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.13.2</version>  <!-- 原 3.8.1 不支持注解等新特性 -->
       <scope>test</scope>
     </dependency>
+
     <dependency>
        <groupId>com.oceanbase</groupId>
        <artifactId>oceanbase-client</artifactId>
        <version>2.4.1</version>
     </dependency>
+
     <dependency>
        <groupId>com.googlecode.json-simple</groupId>
        <artifactId>json-simple</artifactId>
        <version>1.1.1</version>
     </dependency>
+
     <dependency>
        <groupId>com.github.jsqlparser</groupId>
        <artifactId>jsqlparser</artifactId>
-       <version>5.1</version>
+       <version>4.7</version>  <!-- 5.x 需要 Java 11+，需降级到 4.7 -->
     </dependency>
   </dependencies>
+
+  <licenses>
+    <license>
+        <name>Mulan Permissive Software License，Version 2</name>
+        <url>http://license.coscl.org.cn/MulanPSL2/</url>
+    </license>
+  </licenses>
+
+  <developers>
+      <developer>
+          <name>Haikang Shan</name>
+          <email>shanhaikang.shk@oceanbase.com</email>
+          <url>https://github.com/GITHUBear</url>
+          <organization>OceanBase</organization>
+          <timezone>8</timezone>
+      </developer>
+  </developers>
+
+  <scm>
+      <connection>scm:git:https://github.com/oceanbase/obvec_jdbc.git</connection>
+      <developerConnection>scm:git:https://github.com/oceanbase/obvec_jdbc.git</developerConnection>
+      <url>https://github.com/oceanbase/obvec_jdbc</url>
+      <tag>HEAD</tag>
+  </scm>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <compilerArgs>
+            <arg>-Xlint:-options</arg>
+          </compilerArgs>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.3.1</version>
+          <executions>
+              <execution>
+                  <id>attach-javadocs</id>
+                  <goals>
+                      <goal>jar</goal>
+                  </goals>
+                  <configuration>
+                      <failOnWarnings>true</failOnWarnings>
+                  </configuration>
+              </execution>
+          </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <distributionManagement>
+    <repository>
+        <id>sonatype-nexus-staging</id>
+        <name>Nexus Release Repository</name>
+        <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+</distributionManagement>
 </project>
