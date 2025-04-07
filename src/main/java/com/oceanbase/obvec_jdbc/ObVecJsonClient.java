@@ -42,10 +42,11 @@ public class ObVecJsonClient extends ObVecClient {
         
         String createDataJsonTableSQL = "CREATE TABLE IF NOT EXISTS `" + DATA_JSON_TABLE_NAME + "` (\n" + //
                 "  `user_id` varchar(128) NOT NULL,\n" + //
+                "  `admin_id` varchar(128) NOT NULL,\n" + //
                 "  `jtable_name` varchar(512) NOT NULL,\n" + //
                 "  `jdata_id` int(11) NOT NULL AUTO_INCREMENT,\n" + //
                 "  `jdata` json DEFAULT NULL,\n" + //
-                "  PRIMARY KEY (`jdata_id`, `user_id`, `jtable_name`)\n" + //
+                "  PRIMARY KEY (`jdata_id`, `user_id`, `admin_id`, `jtable_name`)\n" + //
                 ")";
         String createMetaJsonTableSQL = "CREATE TABLE IF NOT EXISTS `" + META_JSON_TABLE_NAME + "` (\n" + //
                 "  `user_id` varchar(128) NOT NULL,\n" + //
@@ -319,14 +320,14 @@ public class ObVecJsonClient extends ObVecClient {
             " WHERE user_id = ? AND jtable_name = ? AND jcol_name = ?";
         String rename_col_sql_str = String.format("UPDATE " + DATA_JSON_TABLE_NAME + //
             " SET jdata = json_insert(json_remove(jdata, '$.%s'), '$.%s', json_value(jdata, '$.%s'))" + //
-            " WHERE user_id = ? AND jtable_name = ?",
+            " WHERE admin_id = ? AND jtable_name = ?",
             old_col_name,
             new_col_name,
             old_col_name
         );
         String cast_col_sql_str = String.format("UPDATE " + DATA_JSON_TABLE_NAME + //
             " SET jdata = json_replace(jdata, '$.%s', json_value(jdata, '$.%s' RETURNING %s))" + //
-            " WHERE user_id = ? AND jtable_name = ?",
+            " WHERE admin_id = ? AND jtable_name = ?",
             new_col_name,
             new_col_name,
             getJsonValueReturningType(new_col_type_str)
@@ -384,7 +385,7 @@ public class ObVecJsonClient extends ObVecClient {
         String delete_col_sql_str = String.format(
             "UPDATE " + DATA_JSON_TABLE_NAME + //
             " SET jdata = json_remove(jdata, '$.%s')" + //
-            " WHERE user_id = ? AND jtable_name = ?",
+            " WHERE admin_id = ? AND jtable_name = ?",
             col_name
         );
         try (PreparedStatement update_meta_sql = this.conn.prepareStatement(update_meta_sql_str);
@@ -509,14 +510,14 @@ public class ObVecJsonClient extends ObVecClient {
             " WHERE user_id = ? AND jtable_name = ? AND jcol_name = ?";
         String cast_col_sql_str_without_default = String.format("UPDATE " + DATA_JSON_TABLE_NAME + //
             " SET jdata = json_replace(jdata, '$.%s', json_value(jdata, '$.%s' RETURNING %s))" + //
-            " WHERE user_id = ? AND jtable_name = ?",
+            " WHERE admin_id = ? AND jtable_name = ?",
             col_name,
             col_name,
             getJsonValueReturningType(new_col_type_str)
         );
         String cast_col_sql_str = String.format("UPDATE " + DATA_JSON_TABLE_NAME + //
             " SET jdata = json_replace(jdata, '$.%s', IFNULL(json_value(jdata, '$.%s' RETURNING %s), %s))" + //
-            " WHERE user_id = ? AND jtable_name = ?",
+            " WHERE admin_id = ? AND jtable_name = ?",
             col_name,
             col_name,
             getJsonValueReturningType(new_col_type_str),
@@ -602,12 +603,12 @@ public class ObVecJsonClient extends ObVecClient {
             " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String insert_col_sql_str_without_default = String.format("UPDATE " + DATA_JSON_TABLE_NAME + //
             " SET jdata = json_insert(jdata, '$.%s', null)" + //
-            " WHERE user_id = ? AND jtable_name = ?",
+            " WHERE admin_id = ? AND jtable_name = ?",
             col_name
         );
         String insert_col_sql_str = String.format("UPDATE " + DATA_JSON_TABLE_NAME + //
             " SET jdata = json_insert(jdata, '$.%s', %s)" + //
-            " WHERE user_id = ? AND jtable_name = ?",
+            " WHERE admin_id = ? AND jtable_name = ?",
             col_name,
             col_constraints.jdata.toJson()
         );
