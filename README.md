@@ -4,6 +4,18 @@ A JAVA SDK for OceanBase Vector Store and JSON virtual table.
 
 ## Installation
 
+- Install with Maven:
+
+1. Add a dependency in your project's `pom.xml` file.
+
+```
+<dependency>
+  <groupId>com.oceanbase</groupId>
+  <artifactId>obvec_jdbc</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
 - Install with source code:
 
 1. Install sdk with maven.  
@@ -20,7 +32,7 @@ mvn install
 <dependency>
   <groupId>com.oceanbase</groupId>
   <artifactId>obvec_jdbc</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
 </dependency>
 ```
 
