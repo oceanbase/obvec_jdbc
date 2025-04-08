@@ -23,6 +23,7 @@ import net.sf.jsqlparser.statement.alter.AlterOperation;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
+import net.sf.jsqlparser.statement.drop.Drop;
 
 import java.sql.SQLException;
 
@@ -726,18 +727,70 @@ public class ObVecJsonClient extends ObVecClient {
         }
     }
 
-    public String parseJsonTableSQL2NormalSQL(String json_table_sql) {
-        try {
-            net.sf.jsqlparser.statement.Statement stmt = CCJSqlParserUtil.parse(json_table_sql);
-            if (stmt instanceof CreateTable) {
-                handleCreateJsonTable((CreateTable)stmt);
-            } else if (stmt instanceof Alter) {
-                handleAlterJsonTable((Alter)stmt);
-            } else {
-                throw new UnsupportedOperationException("Unsupported JSON Table SQL: " + json_table_sql);
+    private void handleDropTable(Drop stmt) {
+        String type = stmt.getType();
+        if (!type.toUpperCase().equals("TABLE")) {
+            throw new IllegalArgumentException("DROP " + type + " is not supported");
+        }
+        
+        net.sf.jsqlparser.schema.Table table = stmt.getName();
+        if (table == null) {
+            throw new IllegalArgumentException("Invalid drop table statement: " + stmt.toString());
+        }
+
+        String table_name = getRealName(table.getName());
+        boolean table_exists = metadata.checkTableExists(table_name);
+        if (!table_exists) {
+            if (stmt.isIfExists()) {
+                return;
             }
+            throw new IllegalArgumentException("Table " + table_name + " does not exists");
+        }
+
+        String delete_meta_sql_str = "DELETE FROM " + META_JSON_TABLE_NAME + //
+            " WHERE user_id = ? AND jtable_name = ?";
+        String delete_data_sql_str = "DELETE FROM " + DATA_JSON_TABLE_NAME + //
+            " WHERE admin_id = ? AND jtable_name = ?";
+        
+        try (PreparedStatement delete_meta_sql = this.conn.prepareStatement(delete_meta_sql_str);
+            PreparedStatement delete_data_sql = this.conn.prepareStatement(delete_data_sql_str)) {
+           this.conn.setAutoCommit(false);
+           delete_meta_sql.setString(1, this.user_id);
+           delete_meta_sql.setString(2, table_name);
+           delete_meta_sql.executeUpdate();
+
+           delete_data_sql.setString(1, this.user_id);
+           delete_data_sql.setString(2, table_name);
+           delete_data_sql.executeUpdate();
+           this.conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            if (this.conn != null) {
+                try {
+                    this.conn.rollback();
+                } catch (SQLException se) {
+                    se.printStackTrace();
+                }
+            }
+        }
+
+        try {
+            metadata.reflect(this.conn);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public String parseJsonTableSQL2NormalSQL(String json_table_sql) throws Exception {
+        net.sf.jsqlparser.statement.Statement stmt = CCJSqlParserUtil.parse(json_table_sql);
+        if (stmt instanceof CreateTable) {
+            handleCreateJsonTable((CreateTable)stmt);
+        } else if (stmt instanceof Alter) {
+            handleAlterJsonTable((Alter)stmt);
+        } else if (stmt instanceof Drop) {
+            handleDropTable((Drop)stmt);
+        } else {
+            throw new UnsupportedOperationException("Unsupported JSON Table SQL: " + json_table_sql);
         }
         return null;
     }
