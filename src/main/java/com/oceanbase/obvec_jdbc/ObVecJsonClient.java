@@ -522,7 +522,7 @@ public class ObVecJsonClient extends ObVecClient {
             col_name,
             col_name,
             getJsonValueReturningType(new_col_type_str),
-            col_constraints.jdata.toJson()
+            col_constraints.jdata != null ? col_constraints.jdata.toJson() : "null"
         );
         try (PreparedStatement update_meta_sql = this.conn.prepareStatement(update_meta_sql_str);
              PreparedStatement cast_col_sql_without_default = this.conn.prepareStatement(cast_col_sql_str_without_default);
@@ -611,7 +611,7 @@ public class ObVecJsonClient extends ObVecClient {
             " SET jdata = json_insert(jdata, '$.%s', %s)" + //
             " WHERE admin_id = ? AND jtable_name = ?",
             col_name,
-            col_constraints.jdata.toJson()
+            col_constraints.jdata != null ? col_constraints.jdata.toJson() : "null"
         );
         try (PreparedStatement insert_sql = this.conn.prepareStatement(insert_sql_str);
              PreparedStatement insert_col_sql_without_default = this.conn.prepareStatement(insert_col_sql_str_without_default);
