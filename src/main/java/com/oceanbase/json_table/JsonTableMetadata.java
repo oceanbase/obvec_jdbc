@@ -29,7 +29,7 @@ public class JsonTableMetadata {
         meta_cache = new HashMap<>();
     }
 
-    public void reflect(Connection conn) {
+    public void reflect(Connection conn) throws Throwable {
         meta_cache.clear();
 
         Statement statement = null;
@@ -85,12 +85,14 @@ public class JsonTableMetadata {
             }
         } catch (Throwable e) {
             e.printStackTrace();
+            throw e;
         } finally {
             try {
                 if (resultSet != null) resultSet.close();
                 if (statement != null) statement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+                throw e;
             }
         }
     }

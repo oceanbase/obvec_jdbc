@@ -45,9 +45,10 @@ public class AppTest
         String uri = "jdbc:oceanbase://127.0.0.1:2881/test";
         String user = "root@test";
         String password = "";
-        ObVecJsonClient client = new ObVecJsonClient(uri, user, password, "0", Level.INFO, false);
-        client.reset();
         try {
+            ObVecJsonClient client = new ObVecJsonClient(uri, user, password, "0", Level.INFO, false);
+            client.reset();
+            
             String sql = "create table `t2` (c1 int NOT NULL DEFAULT 10, c2 varchar(30) DEFAULT 'ca', c3 varchar not null, c4 decimal(10, 2), c5 timestamp default current_timestamp);";
             client.parseJsonTableSQL2NormalSQL(sql);
 
@@ -72,7 +73,7 @@ public class AppTest
             client.parseJsonTableSQL2NormalSQL(
                 "DROP TABLE IF EXISTS t2"
             );
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

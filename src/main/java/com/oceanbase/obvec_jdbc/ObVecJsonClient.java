@@ -34,7 +34,7 @@ public class ObVecJsonClient extends ObVecClient {
     private JsonTableMetadata metadata;
     private String user_id;
 
-    public ObVecJsonClient(String uri, String user, String password, String user_id, Level log_level, boolean skip_create)
+    public ObVecJsonClient(String uri, String user, String password, String user_id, Level log_level, boolean skip_create) throws Throwable
     {
         super(uri, user, password);
         this.logger.setLevel(log_level);
@@ -74,8 +74,10 @@ public class ObVecJsonClient extends ObVecClient {
                         this.conn.rollback();
                     } catch (SQLException se) {
                         se.printStackTrace();
+                        throw se;
                     }
                 }
+                throw e;
             }
         }
 
@@ -83,10 +85,11 @@ public class ObVecJsonClient extends ObVecClient {
             metadata.reflect(this.conn);
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
 
-    public void reset() {
+    public void reset() throws Throwable {
         try (Statement stmt = this.conn.createStatement()) {
             this.conn.setAutoCommit(false);
             stmt.execute("TRUNCATE TABLE " + DATA_JSON_TABLE_NAME);
@@ -100,12 +103,14 @@ public class ObVecJsonClient extends ObVecClient {
                     this.conn.rollback();
                 } catch (SQLException se) {
                     se.printStackTrace();
+                    throw se;
                 }
             }
+            throw e;
         }
     }
 
-    public void refreshMetadata() {
+    public void refreshMetadata() throws Throwable {
         metadata.reflect(this.conn);
     }
 
@@ -117,7 +122,7 @@ public class ObVecJsonClient extends ObVecClient {
     }
 
     @SuppressWarnings("unchecked")
-    private void handleCreateJsonTable(CreateTable stmt) {
+    private void handleCreateJsonTable(CreateTable stmt) throws Throwable {
         net.sf.jsqlparser.schema.Table table = stmt.getTable();
         if (table == null) {
             throw new IllegalArgumentException("Invalid create table statement: " + stmt.toString());
@@ -245,8 +250,10 @@ public class ObVecJsonClient extends ObVecClient {
                     this.conn.rollback();
                 } catch (SQLException se) {
                     se.printStackTrace();
+                    throw se;
                 }
             }
+            throw e;
         }
 
         logger.info("CREATE NEW JSON TABLE: " + table_name + " with columns: " + new_meta_cache_items.toString());
@@ -292,7 +299,7 @@ public class ObVecJsonClient extends ObVecClient {
     }
 
     @SuppressWarnings("unchecked")
-    private void handleAlterJTableChangeColumn(String table_name, AlterExpression alter_expr) {
+    private void handleAlterJTableChangeColumn(String table_name, AlterExpression alter_expr) throws Throwable {
         logger.info("HANDLE ALTER CHANGE COLUMN");
 
         String col_spec = alter_expr.getOptionalSpecifier();
@@ -364,12 +371,14 @@ public class ObVecJsonClient extends ObVecClient {
                     this.conn.rollback();
                 } catch (SQLException se) {
                     se.printStackTrace();
+                    throw se;
                 }
             }
+            throw e;
         }
     }
 
-    private void handleAlterJTableDropColumn(String table_name, AlterExpression alter_expr) {
+    private void handleAlterJTableDropColumn(String table_name, AlterExpression alter_expr) throws Throwable {
         logger.info("HANDLE ALTER DROP COLUMN");
 
         String col_name = alter_expr.getColumnName();
@@ -408,8 +417,10 @@ public class ObVecJsonClient extends ObVecClient {
                     this.conn.rollback();
                 } catch (SQLException se) {
                     se.printStackTrace();
+                    throw se;
                 }
             }
+            throw e;
         }        
     }
 
@@ -431,6 +442,7 @@ public class ObVecJsonClient extends ObVecClient {
                 if (sql_stmt != null) sql_stmt.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+                return false;
             }
         }
         return true;
@@ -478,7 +490,7 @@ public class ObVecJsonClient extends ObVecClient {
     }
 
     @SuppressWarnings("unchecked")
-    public void handleAlterJTableModifyColumn(String table_name, AlterExpression alter_expr) {
+    public void handleAlterJTableModifyColumn(String table_name, AlterExpression alter_expr) throws Throwable {
         logger.info("HANDLE ALTER MODIFY COLUMN");
 
         List<ColumnDataType> col_types = alter_expr.getColDataTypeList();
@@ -558,13 +570,15 @@ public class ObVecJsonClient extends ObVecClient {
                     this.conn.rollback();
                 } catch (SQLException se) {
                     se.printStackTrace();
+                    throw se;
                 }
             }
+            throw e;
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void handleAlterJTableAddColumn(String table_name, AlterExpression alter_expr) {
+    private void handleAlterJTableAddColumn(String table_name, AlterExpression alter_expr) throws Throwable {
         logger.info("HANDLE ALTER ADD COLUMN");
 
         List<ColumnDataType> col_types = alter_expr.getColDataTypeList();
@@ -647,12 +661,14 @@ public class ObVecJsonClient extends ObVecClient {
                     this.conn.rollback();
                 } catch (SQLException se) {
                     se.printStackTrace();
+                    throw se;
                 }
             }
+            throw e;
         }
     }
 
-    private void handleAlterJTableRenameTable(String table_name, AlterExpression alter_expr) {
+    private void handleAlterJTableRenameTable(String table_name, AlterExpression alter_expr) throws Throwable {
         logger.info("HANDLE ALTER RENAME TABLE");
 
         String new_table_name = alter_expr.getNewTableName();
@@ -682,12 +698,14 @@ public class ObVecJsonClient extends ObVecClient {
                     this.conn.rollback();
                 } catch (SQLException se) {
                     se.printStackTrace();
+                    throw se;
                 }
             }
+            throw e;
         }
     }
 
-    private void handleAlterJsonTable(Alter stmt) {
+    private void handleAlterJsonTable(Alter stmt) throws Throwable {
         net.sf.jsqlparser.schema.Table table = stmt.getTable();
         if (table == null) {
             throw new IllegalArgumentException("Invalid create table statement: " + stmt.toString());
@@ -722,12 +740,13 @@ public class ObVecJsonClient extends ObVecClient {
 
         try {
             metadata.reflect(this.conn);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
+            throw e;
         }
     }
 
-    private void handleDropTable(Drop stmt) {
+    private void handleDropTable(Drop stmt) throws Throwable {
         String type = stmt.getType();
         if (!type.toUpperCase().equals("TABLE")) {
             throw new IllegalArgumentException("DROP " + type + " is not supported");
@@ -770,18 +789,20 @@ public class ObVecJsonClient extends ObVecClient {
                     this.conn.rollback();
                 } catch (SQLException se) {
                     se.printStackTrace();
+                    throw se;
                 }
             }
+            throw e;
         }
 
         try {
             metadata.reflect(this.conn);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    public String parseJsonTableSQL2NormalSQL(String json_table_sql) throws Exception {
+    public String parseJsonTableSQL2NormalSQL(String json_table_sql) throws Throwable {
         net.sf.jsqlparser.statement.Statement stmt = CCJSqlParserUtil.parse(json_table_sql);
         if (stmt instanceof CreateTable) {
             handleCreateJsonTable((CreateTable)stmt);

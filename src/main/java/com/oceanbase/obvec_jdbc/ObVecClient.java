@@ -14,16 +14,17 @@ import java.util.HashMap;
 public class ObVecClient {
     protected Connection conn = null;
 
-    public ObVecClient(String uri, String user, String password)
+    public ObVecClient(String uri, String user, String password) throws Throwable
     {
         try {
             conn = DriverManager.getConnection(uri, user, password);
         } catch (SQLException e) {
             e.printStackTrace();
+            throw e;
         }
     }
 
-    public void dropCollection(String table_name) 
+    public void dropCollection(String table_name) throws Throwable
     {
         Statement statement = null;
 
@@ -33,16 +34,18 @@ public class ObVecClient {
             statement.executeQuery(sql);
         } catch (Throwable e) {
             e.printStackTrace();
+            throw e;
         } finally {
             try {
                 if (statement != null) statement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+                throw e;
             }
         }
     }
 
-    public boolean hasCollection(String table_name) 
+    public boolean hasCollection(String table_name) throws Throwable
     {
         boolean exists = false;
         try {
@@ -53,12 +56,13 @@ public class ObVecClient {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw e;
         }
 
         return exists;
     }
 
-    public void createCollection(String table_name, ObCollectionSchema collection)
+    public void createCollection(String table_name, ObCollectionSchema collection) throws Throwable
     {
         Statement statement = null;
 
@@ -68,16 +72,18 @@ public class ObVecClient {
             statement.executeQuery(sql);
         } catch (Throwable e) {
             e.printStackTrace();
+            throw e;
         } finally {
             try {
                 if (statement != null) statement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+                throw e;
             }
         }
     }
 
-    public void createIndex(String table_name, IndexParam index_param)
+    public void createIndex(String table_name, IndexParam index_param) throws Throwable
     {
         Statement statement = null;
 
@@ -91,16 +97,18 @@ public class ObVecClient {
             statement.executeQuery(sql);
         } catch (Throwable e) {
             e.printStackTrace();
+            throw e;
         } finally {
             try {
                 if (statement != null) statement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+                throw e;
             }
         }
     }
 
-    public void insert(String table_name, String[] column_names, ArrayList<Sqlizable[]> rows)
+    public void insert(String table_name, String[] column_names, ArrayList<Sqlizable[]> rows) throws Throwable
     {
         if (rows.isEmpty()) {
             return;
@@ -136,9 +144,11 @@ public class ObVecClient {
                     System.out.println("Transaction rolled back");
                 } catch (SQLException rollbackEx) {
                     rollbackEx.printStackTrace();
+                    throw rollbackEx;
                 }
             }
             e.printStackTrace();
+            throw e;
         } finally {
             // reset autocommit
             if (conn != null) {
@@ -146,12 +156,13 @@ public class ObVecClient {
                     conn.setAutoCommit(true);
                 } catch (SQLException e) {
                     e.printStackTrace();
+                    throw e;
                 }
             }
         }
     }
 
-    public void delete(String table_name, String primary_key_name, ArrayList<Sqlizable> primary_keys)
+    public void delete(String table_name, String primary_key_name, ArrayList<Sqlizable> primary_keys) throws Throwable
     {
         Statement statement = null;
 
@@ -169,11 +180,13 @@ public class ObVecClient {
             preparedStatement.executeUpdate();
         } catch (Throwable e) {
             e.printStackTrace();
+            throw e;
         } finally {
             try {
                 if (statement != null) statement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+                throw e;
             }
         }
     }
@@ -185,7 +198,7 @@ public class ObVecClient {
                       int topk,
                       String[] output_fields,
                       DataType[] output_datatypes,
-                      String where_expr)
+                      String where_expr) throws Throwable
     {
         if (output_datatypes.length != output_fields.length) {
             return null;
@@ -237,12 +250,14 @@ public class ObVecClient {
             }
         } catch (Throwable e) {
             e.printStackTrace();
+            throw e;
         } finally {
             try {
                 if (resultSet != null) resultSet.close();
                 if (statement != null) statement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+                throw e;
             }
         }
         return res;
