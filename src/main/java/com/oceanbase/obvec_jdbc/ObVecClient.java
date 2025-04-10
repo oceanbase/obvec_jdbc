@@ -220,7 +220,7 @@ public class ObVecClient {
             String sql = String.format("SELECT %s FROM %s WHERE %s ORDER BY %s(%s, '[%s]') APPROXIMATE LIMIT %d",
                             String.join(", ", output_fields),
                             table_name,
-                            (where_expr == null) ? "" : where_expr,
+                            (where_expr == null) ? "1" : where_expr,
                             dist_func,
                             vec_col_name,
                             String.join(", ", vec_str),

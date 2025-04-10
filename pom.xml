@@ -3,7 +3,7 @@
   <groupId>com.oceanbase</groupId>
   <artifactId>obvec_jdbc</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <name>obvec_jdbc</name>
   <description>JAVA SDK for OceanBase Vector Store and JSON virtual table.</description>
   <url>http://maven.apache.org</url>

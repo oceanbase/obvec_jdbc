@@ -30,12 +30,17 @@ public class ObCollectionSchema extends Visitable {
             }
             column_defs[i] = field.visit();
         }
+        ArrayList<String> table_schema_strs = new ArrayList<>();
         String joined_column_def = String.join(", ", column_defs);
-        String primary_key_def = String.format("PRIMARY KEY(%s)", String.join(", ", primary_keys));
-        if (this.index_params == null) {
-            return joined_column_def + ", " + primary_key_def;
+        table_schema_strs.add(joined_column_def);
+        if (!primary_keys.isEmpty()) {
+            String primary_key_def = String.format("PRIMARY KEY(%s)", String.join(", ", primary_keys));
+            table_schema_strs.add(primary_key_def);
         }
-        return joined_column_def + ", " + primary_key_def + ", " + index_params.visit();
+        if (this.index_params != null) {
+            table_schema_strs.add(index_params.visit());
+        }
+        return String.join(", ", table_schema_strs);
     }
     
 }
