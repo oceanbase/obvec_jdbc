@@ -87,6 +87,9 @@ public class ObFieldSchema extends Visitable {
         if (!checkIsValid()) {
             throw new UnsupportedOperationException("Necessary arguments are not exist");
         }
+        if (this.isNullable && this.isAutoInc) {
+            throw new UnsupportedOperationException("Auto increment column can not be nullable");
+        }
         String nullable = "NOT NULL";
         if (this.isNullable) {
             nullable = "NULL";

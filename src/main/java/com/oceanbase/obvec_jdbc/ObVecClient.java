@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -200,10 +201,6 @@ public class ObVecClient {
                       DataType[] output_datatypes,
                       String where_expr) throws Throwable
     {
-        if (output_datatypes.length != output_fields.length) {
-            return null;
-        }
-
         ArrayList<HashMap<String, Sqlizable>> res = new ArrayList<>();
 
         Statement statement = null;
@@ -239,13 +236,18 @@ public class ObVecClient {
                             String.join(", ", vec_str),
                             topk);
             resultSet = statement.executeQuery(sql);
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int project_count = metaData.getColumnCount();
             
             while (resultSet.next()) {
                 HashMap<String, Sqlizable> row = new HashMap<>();
-                for (int i = 0; i < output_fields.length; i++) {
-                    Sqlizable sqlizable = SqlizableFactory.build(output_datatypes[i], resultSet, output_fields[i]);
-                    row.put(output_fields[i], sqlizable);
+                
+                for (int i = 1; i <= project_count; i++) {
+                    String columnName = metaData.getColumnName(i);
+                    Sqlizable sqlizable = SqlizableFactory.build(output_datatypes[i - 1], resultSet, columnName);
+                    row.put(columnName, sqlizable);
                 }
+
                 res.add(row);
             }
         } catch (Throwable e) {

@@ -130,9 +130,45 @@ public class VecClientTest
                 tb_name = "JAVA_TEST2";
                 ob.dropCollection(tb_name);
                 ObCollectionSchema collectionSchema2 = new ObCollectionSchema();
-                ObFieldSchema c1_field2 = new ObFieldSchema("c1", DataType.INT32);
+                ObFieldSchema c1_field2 = new ObFieldSchema("id", DataType.INT32);
+                c1_field2.IsAutoInc(true).IsPrimary(true);
                 collectionSchema2.addField(c1_field2);
+                ObFieldSchema c2_field2 = new ObFieldSchema("vec", DataType.FLOAT_VECTOR);
+                c2_field2.Dim(3);
+                collectionSchema2.addField(c2_field2);
                 ob.createCollection(tb_name, collectionSchema2);
+
+                ArrayList<Sqlizable[]> insert_rows2 = new ArrayList<>();
+                Sqlizable[] ir21 = { new SqlVector(new float[] {1.0f, 2.0f, 3.0f}) };
+                insert_rows2.add(ir21);
+                Sqlizable[] ir22 = { new SqlVector(new float[] {1.1f, 2.2f, 3.3f}) };
+                insert_rows2.add(ir22);
+                Sqlizable[] ir23 = { new SqlVector(new float[] {0f, 0f, 0f}) };
+                insert_rows2.add(ir23);
+                ob.insert(tb_name, new String[] {"vec"}, insert_rows2);
+
+                IndexParam index_param2 = new IndexParam("vidx2", "vec");
+                index_param2.MetricType("inner_product");
+                ob.createIndex(tb_name, index_param2);
+
+                ArrayList<HashMap<String, Sqlizable>> res2 = ob.query(tb_name, "vec", "ip", 
+                        new float[] {1f, 1f, 1f}, 10,
+                        new String[] {"*"},
+                        new DataType[] {
+                            DataType.INT32,
+                            DataType.FLOAT_VECTOR
+                        }, null);
+                if (res2 != null) {
+                    for (int i = 0; i < res2.size(); i++) {
+                        for (HashMap.Entry<String, Sqlizable> entry : res2.get(i).entrySet()) {
+                            System.out.printf("%s : %s, ", entry.getKey(), entry.getValue().toString());
+                        }
+                        System.out.print("\n");
+                    }
+                } else {
+                    System.out.println("res is null");
+                }
+                
             } catch (Throwable e) {
                 e.printStackTrace();
             }

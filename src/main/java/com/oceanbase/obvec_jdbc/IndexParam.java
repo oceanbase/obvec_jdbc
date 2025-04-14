@@ -36,7 +36,7 @@ public class IndexParam extends Visitable {
 
     private boolean checkMetricType(String metric_type) {
         String metric_type_lower = metric_type.toLowerCase();
-        return metric_type_lower.equals("l2") || metric_type_lower.equals("ip");
+        return metric_type_lower.equals("l2") || metric_type_lower.equals("inner_product");
     }
 
     public IndexParam MetricType(String metric_type) {
