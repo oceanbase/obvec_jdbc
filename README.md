@@ -12,7 +12,7 @@ A JAVA SDK for OceanBase Vector Store and JSON virtual table.
 <dependency>
   <groupId>com.oceanbase</groupId>
   <artifactId>obvec_jdbc</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
 </dependency>
 ```
 
