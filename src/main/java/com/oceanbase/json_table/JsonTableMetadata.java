@@ -40,7 +40,7 @@ public class JsonTableMetadata {
                 "SELECT jtable_name, jcol_id, " + //
                 "jcol_name, jcol_type, jcol_nullable, " + //
                 "jcol_has_default, jcol_default " + //
-                "FROM _meta_json_t " + //
+                "FROM meta_json_t " + //
                 "WHERE user_id = '%s'",
                 user_id
             );

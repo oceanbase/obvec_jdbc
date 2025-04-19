@@ -28,8 +28,8 @@ import net.sf.jsqlparser.statement.drop.Drop;
 import java.sql.SQLException;
 
 public class ObVecJsonClient extends ObVecClient {
-    public static String DATA_JSON_TABLE_NAME = "_data_json_t";
-    public static String META_JSON_TABLE_NAME = "_meta_json_t";
+    public static String DATA_JSON_TABLE_NAME = "data_json_t";
+    public static String META_JSON_TABLE_NAME = "meta_json_t";
     private final Logger logger = Logger.getLogger(ObVecJsonClient.class.getName());
     private JsonTableMetadata metadata;
     private String user_id;
