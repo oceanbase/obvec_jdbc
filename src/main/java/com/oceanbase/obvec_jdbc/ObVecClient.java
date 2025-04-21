@@ -1,5 +1,6 @@
 package com.oceanbase.obvec_jdbc;
 
+import java.rmi.UnexpectedException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -23,6 +24,58 @@ public class ObVecClient {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    public void setHNSWEfSearch(int val) throws Throwable {
+        Statement statement = null;
+
+        try {
+            statement = conn.createStatement();
+            String sql = String.format("SET @@ob_hnsw_ef_search = %d", val);
+            statement.executeQuery(sql);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            try {
+                if (statement != null) statement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw e;
+            }
+        }
+    }
+
+    public int getHNSWEfSearch() throws Throwable {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        ArrayList<Integer> res = new ArrayList<>();
+
+        try {
+            statement = conn.createStatement();
+            String sql = String.format("show variables like 'ob_hnsw_ef_search'");
+            resultSet = statement.executeQuery(sql);
+            
+            while (resultSet.next()) {
+                res.add(resultSet.getInt("Value"));
+            }
+
+            if (res.size() != 1) {
+                throw new UnexpectedException("ob_hnsw_ef_search is a single variable");
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw e;
+            }
+        }
+        return res.get(0);
     }
 
     public void dropCollection(String table_name) throws Throwable

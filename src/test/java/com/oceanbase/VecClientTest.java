@@ -169,6 +169,12 @@ public class VecClientTest
                     System.out.println("res is null");
                 }
                 
+                int ef_search_before = ob.getHNSWEfSearch();
+                System.out.println("before set ef_search: " + ef_search_before);
+                ob.setHNSWEfSearch(200);
+                int ef_search = ob.getHNSWEfSearch();
+                System.out.println("ef_search: " + ef_search);
+
             } catch (Throwable e) {
                 e.printStackTrace();
             }
