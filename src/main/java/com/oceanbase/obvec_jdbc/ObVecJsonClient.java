@@ -463,6 +463,8 @@ public class ObVecJsonClient extends ObVecClient {
                         throw new IllegalArgumentException("Invalid column spec: " + col_specs.toString());
                     }
                     col_default_val = col_specs.get(spec_idx);
+                } else if (col_spec.equals("NULL")) {
+                    // do nothing
                 } else if (col_spec.equals("NOT")) {
                     spec_idx += 1;
                     if (spec_idx >= col_specs.size()) {
@@ -705,6 +707,11 @@ public class ObVecJsonClient extends ObVecClient {
         }
     }
 
+    // TODO
+    private void handleAlterJTableAlter(String table_name, AlterExpression alter_expr) {
+
+    }
+
     private void handleAlterJsonTable(Alter stmt) throws Throwable {
         net.sf.jsqlparser.schema.Table table = stmt.getTable();
         if (table == null) {
@@ -733,6 +740,8 @@ public class ObVecJsonClient extends ObVecClient {
                 handleAlterJTableModifyColumn(table_name, alter_expr);
             } else if (op == AlterOperation.RENAME_TABLE) {
                 handleAlterJTableRenameTable(table_name, alter_expr);
+            } else if (op == AlterOperation.ALTER) {
+                handleAlterJTableAlter(table_name, alter_expr);
             } else {
                 throw new IllegalArgumentException("Invalid alter operation: " + op);
             }

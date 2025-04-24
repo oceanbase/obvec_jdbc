@@ -291,6 +291,9 @@ public class ObVecClient {
             resultSet = statement.executeQuery(sql);
             ResultSetMetaData metaData = resultSet.getMetaData();
             int project_count = metaData.getColumnCount();
+            if (project_count != output_datatypes.length) {
+                throw new IllegalArgumentException(" the length of output_datatypes: " + output_datatypes.length + " mismatched with projected column size: " + project_count);
+            }
             
             while (resultSet.next()) {
                 HashMap<String, Sqlizable> row = new HashMap<>();

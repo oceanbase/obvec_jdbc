@@ -3,7 +3,6 @@ package com.oceanbase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
 
 import com.oceanbase.obvec_jdbc.DataType;
 import com.oceanbase.obvec_jdbc.IndexParam;
@@ -174,7 +173,15 @@ public class VecClientTest
                 ob.setHNSWEfSearch(200);
                 int ef_search = ob.getHNSWEfSearch();
                 System.out.println("ef_search: " + ef_search);
+                
+                ObVecClient client2 = new ObVecClient(uri, user, password);
+                int client2_efsearch = client2.getHNSWEfSearch();
+                System.out.println("client2 ef_search: " + client2_efsearch);
+                client2.setHNSWEfSearch(100);
 
+                ef_search = ob.getHNSWEfSearch();
+                client2_efsearch = client2.getHNSWEfSearch();
+                System.out.println("ef_search: " + ef_search + " client2 ef_search: " + client2_efsearch);
             } catch (Throwable e) {
                 e.printStackTrace();
             }

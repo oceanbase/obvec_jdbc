@@ -5,7 +5,7 @@ public class IndexParam extends Visitable {
     private String vector_field_name;
     private int m = 16;
     private int ef_construction = 200;
-    private int ef_search = 40;
+    private int ef_search = 64;
     private String lib = "vsag";
     private String metric_type = "l2";
 

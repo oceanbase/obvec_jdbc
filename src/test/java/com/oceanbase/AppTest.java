@@ -58,10 +58,13 @@ public class AppTest
             sql = "ALTER TABLE t2 DROP c1";
             client.parseJsonTableSQL2NormalSQL(sql);
 
-            sql = "ALTER TABLE t2 MODIFY COLUMN changed_col TIMESTAMP NOT NULL DEFAULT current_timestamp";
+            sql = "ALTER TABLE t2 MODIFY COLUMN changed_col TIMESTAMP NULL DEFAULT current_timestamp";
             client.parseJsonTableSQL2NormalSQL(sql);
 
             sql = "ALTER TABLE t2 ADD COLUMN email VARCHAR(100) default 'example@example.com'";
+            client.parseJsonTableSQL2NormalSQL(sql);
+
+            sql = "ALTER TABLE t2 ALTER email DROP DEFAULT";
             client.parseJsonTableSQL2NormalSQL(sql);
 
             sql = "ALTER TABLE t2 ADD COLUMN email2 VARCHAR(100)";
